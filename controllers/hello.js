@@ -2,8 +2,8 @@ exports.hello = (req, res) => {
     let jsonString = `[
         {
             "id": 1,
-            "name": "Leanne Graham",
-            "username": "Bret",
+            "name": "Derek Hsieh",
+            "username": "DerekHsieh",
             "email": "Sincere@april.biz",
             "address": {
                 "street": "Kulas Light",
