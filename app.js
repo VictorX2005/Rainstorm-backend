@@ -1,7 +1,15 @@
 const express = require('express');
 const mongoose = require('mongoose');
 require('dotenv').config();
+
+// import users 
+var userModel = require("./models/user.model");
+
+// routers configuration
+var usersRouter = require("./routes/users");
+
 app = express();
+app.use(express.json())
 
 // mongodb configuration -> database uri is located in .env file
 const uri = process.env.URI;
@@ -10,6 +18,8 @@ const uri = process.env.URI;
 // mongodb connection
 mongoose.connect(uri);
 
+
+
 mongoose.connection.on("connected", ()=> {
     console.log("Connected to MongoDB using MongooseJS");
 });
@@ -17,6 +27,9 @@ mongoose.connection.on("connected", ()=> {
 
 app.set('view engine', 'ejs');
 app.use("/", require("./routes/hello"))
+
+// users 
+app.use("/users", usersRouter)
 
 const PORT = process.env.PORT || 3000;
 
