@@ -44,6 +44,7 @@ router.post('/', function(req,res) {
 
 // authentication 
 
+/// TODO: implement warning messages: "password incorrect", "cant find user linked to this email"
 router.post('/:email/:password', function(req,res) {
     UserModel.find({email: req.params['email']}, function(err, user) {
         if(user != undefined ) {
