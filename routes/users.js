@@ -1,7 +1,6 @@
 const express = require('express');
-
-router = express.Router();
 const mongoose = require('mongoose');
+router = express.Router();
 const UserModel = require("../models/user.model");
 users = require("../controllers/users");
 
@@ -23,16 +22,6 @@ router.get('/', function(req,res) {
             res.send(users);
         }
     })
-    //   const newUser = new UserModel({
-    //       username: "devderekhsieh",
-    //       email: "derekyhsieh@gmail.com",
-    //       password: "foo11bar"
-    //   });
-
-    //   newUser.save();
-
-    //   res.json(newUser);
-
 });
 
 router.post('/', function(req,res) {
@@ -51,6 +40,31 @@ router.post('/', function(req,res) {
             }
         })
     })
+})
+
+// authentication 
+
+router.post('/:email/:password', function(req,res) {
+    UserModel.find({email: req.params['email']}, function(err, user) {
+        if(user != undefined ) {
+            console.log(req.params.password)
+            
+            const hash = user[0].password;
+
+            bcrypt.compare(req.params.password, hash, function(err, result) {
+                if(err) {
+                    console.log(err)
+                } else {
+                    res.send(result);
+                }
+                
+            });
+        }
+    }) 
+})
+
+router.get("/:email/:password", function (req, res) {
+    res.send(req.params.username);
 })
 
 module.exports = router;
