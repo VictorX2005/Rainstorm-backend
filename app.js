@@ -26,10 +26,10 @@ mongoose.connection.on("connected", ()=> {
 
 
 app.set('view engine', 'ejs');
-app.use("/", require("./routes/hello"))
+app.use("/api/", require("./routes/hello"))
 
 // users 
-app.use("/users", usersRouter)
+app.use("/api/users", usersRouter)
 
 const PORT = process.env.PORT || 3000;
 
