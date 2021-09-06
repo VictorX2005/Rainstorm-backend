@@ -13,7 +13,6 @@ const saltRounds = 10;
 
 
 
-
 router.get('/', function(req,res) {
     UserModel.find({}, function(err, users) {
         if(err) {
@@ -25,21 +24,46 @@ router.get('/', function(req,res) {
 });
 
 router.post('/', function(req,res) {
-    bcrypt.genSalt(saltRounds, function(err, salt) {
-        bcrypt.hash(req.body.password, salt, function(err, hash) {
-            if(err) {
-                console.log(err)
-            } else {
-                const newUser = new UserModel({
-                    username: req.body.username,
-                    email: req.body.email,
-                    password: hash
-                })
-                newUser.save();
-                res.json(newUser);
-            }
-        })
+
+    // check if user exists 
+
+
+    UserModel.find({username: req.body.username}, function(err, users) {
+        if(users[0]) {
+            console.log(users);
+            res.send("Username already exists. Please pick a unique username");
+            
+        } else {
+            UserModel.find({email: req.body.email}, function(err, users) {
+                if(users[0]) {
+                    res.send("There is already a user with that email address. Please sign in instead.");
+                } else {
+                    // sign up user logic 
+
+                    bcrypt.genSalt(saltRounds, function(err, salt) {
+                        bcrypt.hash(req.body.password, salt, function(err, hash) {
+                            if(err) {
+                                console.log(err)
+                            } else {
+                                const newUser = new UserModel({
+                                    username: req.body.username,
+                                    email: req.body.email,
+                                    password: hash
+                                })
+                                newUser.save();
+                                res.json(newUser);
+                            }
+                        })
+                    })
+                }
+            }) 
+        }
     })
+
+   
+
+
+
 })
 
 // authentication 
@@ -76,5 +100,7 @@ router.post('/:email/:password', function(req,res) {
 router.get("/:email/:password", function (req, res) {
     res.send(req.params.username);
 })
+
+
 
 module.exports = router;
