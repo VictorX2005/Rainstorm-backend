@@ -47,8 +47,9 @@ router.post('/', function(req,res) {
 /// TODO: implement warning messages: "password incorrect", "cant find user linked to this email"
 router.post('/:email/:password', function(req,res) {
     UserModel.find({email: req.params['email']}, function(err, user) {
-        if(user != undefined ) {
-            console.log(req.params.password)
+
+        // check if user in array exists;
+        if(user[0]) {
             
             const hash = user[0].password;
 
@@ -56,10 +57,18 @@ router.post('/:email/:password', function(req,res) {
                 if(err) {
                     console.log(err)
                 } else {
-                    res.send(result);
+                    if(result) {
+                        // correct
+                        res.send("Success! Logging you in...");
+                    } else {
+                        // wrong password
+                        res.send("Password was incorrect, please try again.");
+                    }
                 }
                 
             });
+        } else {
+            res.send("There is no user with that email. Please sign up.");
         }
     }) 
 })
