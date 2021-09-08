@@ -108,7 +108,7 @@ router.post('/', function(req,res) {
                                 var verificationHash = makeid(12);
                                 const newUser = new UserModel({
                                     username: req.body.username.toLowerCase(),
-                                    email: req.body.email,
+                                    email: email,
                                     password: hash,
                                     isVerified: false, 
                                     verificationHash: verificationHash
