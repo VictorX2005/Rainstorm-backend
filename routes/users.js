@@ -21,12 +21,13 @@ var transporter = nodemailer.createTransport({
     }
 })
 
-function sendVerificationEmail(recipient) {
+function sendVerificationEmail(recipient, verificationHash) {
+    
     var mailOptions = {
         from: "devderekhsieh@gmail.com", 
         to: recipient,
         subject: "Verify Your Account by clicking the link below",
-        text: "google.com"
+        html: '<p>Click <a href="http://localhost:3000/api/users/verify/' + verificationHash + '">here</a> to verify your account.</p>'
     }
 
     transporter.sendMail(mailOptions, function(err, info) {
@@ -36,6 +37,19 @@ function sendVerificationEmail(recipient) {
             console.log("email sent: " + info.response);
         }
     })
+
+
+}
+
+function makeid(length) {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * 
+ charactersLength));
+   }
+   return result;
 }
 
 router.get('/', function(req,res) {
@@ -53,6 +67,17 @@ router.get("/:email", function(req,res) {
         res.send(users);
     })
 })
+
+router.get("/verify/:verificationHash", function(req, res) {
+    UserModel.findOneAndUpdate({verificationHash: req.params.verificationHash}, {isVerified: true}, (err, data) => {
+        if(err) {
+            console.log(err);
+        } else {
+            console.log(data);
+            res.send("Successfully verified your account!");
+        }
+    })
+}) 
 
 router.post('/', function(req,res) {
 
@@ -76,14 +101,17 @@ router.post('/', function(req,res) {
                             if(err) {
                                 console.log(err)
                             } else {
+                                var verificationHash = makeid(12);
                                 const newUser = new UserModel({
                                     username: req.body.username,
                                     email: req.body.email,
-                                    password: hash
+                                    password: hash,
+                                    isVerified: false, 
+                                    verificationHash: verificationHash
                                 })
                                 newUser.save();
                                 res.json(newUser);
-                                sendVerificationEmail(newUser.email);
+                                sendVerificationEmail(newUser.email, verificationHash);
                             }
                         })
                     })
