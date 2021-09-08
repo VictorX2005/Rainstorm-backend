@@ -104,18 +104,25 @@ router.post('/', function(req,res) {
                             if(err) {
                                 console.log(err)
                             } else {
-                                var email = validateEmail(req.body.email);
-                                var verificationHash = makeid(12);
-                                const newUser = new UserModel({
-                                    username: req.body.username.toLowerCase(),
-                                    email: email,
-                                    password: hash,
-                                    isVerified: false, 
-                                    verificationHash: verificationHash
-                                })
-                                newUser.save();
-                                res.json(newUser);
-                                sendVerificationEmail(newUser.email, verificationHash);
+                                // email validation 
+                                if(validateEmail(req.body.email)) {
+                                    var email = req.body.email
+                                    var verificationHash = makeid(12);
+                                    const newUser = new UserModel({
+                                        username: req.body.username.toLowerCase(),
+                                        email: email,
+                                        password: hash,
+                                        isVerified: false, 
+                                        verificationHash: verificationHash
+                                    })
+                                    newUser.save();
+                                    res.json(newUser);
+                                    sendVerificationEmail(newUser.email, verificationHash);
+                                } else {
+                                    res.data("Invalid email");
+                                }
+                               
+                              
                             }
                         })
                     })
