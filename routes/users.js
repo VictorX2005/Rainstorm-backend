@@ -52,6 +52,11 @@ function makeid(length) {
    return result;
 }
 
+function validateEmail(email) {
+    const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+}
+
 router.get('/', function(req,res) {
     UserModel.find({}, function(err, users) {
         if(err) {
@@ -80,9 +85,7 @@ router.get("/verify/:verificationHash", function(req, res) {
 }) 
 
 router.post('/', function(req,res) {
-
     // check if user exists 
-
 
     UserModel.find({username: req.body.username}, function(err, users) {
         if(users[0]) {
@@ -101,9 +104,10 @@ router.post('/', function(req,res) {
                             if(err) {
                                 console.log(err)
                             } else {
+                                var email = validateEmail(req.body.email);
                                 var verificationHash = makeid(12);
                                 const newUser = new UserModel({
-                                    username: req.body.username,
+                                    username: req.body.username.toLowerCase(),
                                     email: req.body.email,
                                     password: hash,
                                     isVerified: false, 
