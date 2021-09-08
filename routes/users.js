@@ -3,15 +3,40 @@ const mongoose = require('mongoose');
 router = express.Router();
 const UserModel = require("../models/user.model");
 users = require("../controllers/users");
+var nodemailer = require("nodemailer");
 
 
 // BCRYPT setup
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
+// FUNCTIONS
 
+// sending email with nodemail
+var transporter = nodemailer.createTransport({
+    service: 'gmail', 
+    auth: {
+        user: "devderekhsieh@gmail.com", 
+        pass: process.env.EMAILPASS
+    }
+})
 
+function sendVerificationEmail(recipient) {
+    var mailOptions = {
+        from: "devderekhsieh@gmail.com", 
+        to: recipient,
+        subject: "Verify Your Account by clicking the link below",
+        text: "google.com"
+    }
 
+    transporter.sendMail(mailOptions, function(err, info) {
+        if(err) {
+            console.log(err)
+        } else {
+            console.log("email sent: " + info.response);
+        }
+    })
+}
 
 router.get('/', function(req,res) {
     UserModel.find({}, function(err, users) {
@@ -22,6 +47,12 @@ router.get('/', function(req,res) {
         }
     })
 });
+
+router.get("/:email", function(req,res) {
+    UserModel.find({email: req.params.email}, function(err, users) {
+        res.send(users);
+    })
+})
 
 router.post('/', function(req,res) {
 
@@ -52,6 +83,7 @@ router.post('/', function(req,res) {
                                 })
                                 newUser.save();
                                 res.json(newUser);
+                                sendVerificationEmail(newUser.email);
                             }
                         })
                     })
