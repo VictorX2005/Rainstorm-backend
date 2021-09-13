@@ -21,6 +21,8 @@ var transporter = nodemailer.createTransport({
     }
 })
 
+
+
 function sendVerificationEmail(recipient, verificationHash) {
     
     var mailOptions = {
@@ -56,6 +58,40 @@ function validateEmail(email) {
     const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
 }
+
+// create hash from string 
+
+ function createHashFromString(myString) {
+    bcrypt.genSalt(saltRounds, function(err, salt) {
+        bcrypt.hash(myString, salt, function(err, hash) {
+            if(err) {
+                console.log(err)
+            } else {
+               
+             return hash; 
+            }
+        })
+    })
+}
+
+// reset password 
+router.post('/resetpassword/:verificationHash', function(req, res) {
+
+    const hashedPass = createHashFromString(req.body.newPassword)
+    console.log("hashed pass");
+    console.log(hashedPass);
+
+    UserModel.findOneAndUpdate({verificationHash: req.params.verificationHash}, {password: "123"}, (err, data) => {
+            if(err) {
+                console.log(err);
+            } else {
+                console.log(data);
+                res.send("successfully changed password to " + req.body.newPassword);
+            }
+        }
+    ) 
+}) 
+
 
 router.get('/', function(req,res) {
     UserModel.find({}, function(err, users) {
