@@ -12,7 +12,7 @@ const saltRounds = 10;
 
 // FUNCTIONS
 
-// sending email with nodemail + init transporter
+// sending email with nodemail + init transporter edit
 var transporter = nodemailer.createTransport({
     service: 'gmail', 
     auth: {
